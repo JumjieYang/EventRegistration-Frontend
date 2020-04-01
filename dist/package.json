@@ -1,0 +1,10 @@
+{
+  "name": "eventregistration",
+  "version": "1.0.0",
+  "description": "A Vue.js project",
+  "author": "Junjie Yang<junjie.yang2@mail.mcgill.ca>",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install express"
+  }
+}
