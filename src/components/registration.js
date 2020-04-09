@@ -66,18 +66,15 @@ export default {
     AXIOS.get('/persons')
     .then(response => {
       this.persons = response.data;
-      this.persons.forEach(person => this.getRegistrations(person.name));
     })
     .catch(e => { this.errorPerson = e });
     AXIOS.get('/performers')
     .then(response => {
       this.performers = response.data;
-      this.persons.push(...response.data);
-      this.performers.forEach(person => this.getRegistrations(person.name));
     })
     .catch(e => { this.errorPerson = e });
     AXIOS.get('/events').then(response => {
-      this.events = response.data;
+      this.events.push(...response.data);
     }).catch(e => { this.errorEvent = e });
     AXIOS.get('/theatres').then(response => {
       this.events.push(...response.data);
@@ -117,13 +114,6 @@ export default {
 
     createEvent: function (newEvent) {
       if (!newEvent.title) {
-        let event = {
-          'name': newEvent.name,
-          'date': newEvent.date,
-          'startTime': newEvent.startTime,
-          'endTime': newEvent.endTime
-        }
-        if (!this.events.find(x => x.name === newEvent.name)) { this.events.push(event); }
         let params = {
           'date': newEvent.date,
           'startTime': newEvent.startTime,
@@ -131,6 +121,7 @@ export default {
         }
         AXIOS.post('/events/'.concat(newEvent.name), {}, {params: params})
       .then(response => {
+        this.events.push(response.data);
         this.errorEvent = '';
         this.newEvent.name = this.newEvent.date = this.newEvent.startTime = this.newEvent.endTime = '';
       })
@@ -140,17 +131,6 @@ export default {
         console.log(e);
       });
       } else {
-        let event = {
-          'name': newEvent.name,
-          'date': newEvent.date,
-          'startTime': newEvent.startTime,
-          'endTime': newEvent.endTime,
-          'title': newEvent.title
-        }
-        if (!this.events.find(x => x.name === newEvent.name)) {
-          this.theatres.push(event);
-          this.events.push(event);
-        }
         let params = {
           'date': newEvent.date,
           'startTime': newEvent.startTime,
@@ -159,8 +139,9 @@ export default {
         }
         AXIOS.post('/theatres/'.concat(newEvent.name), {}, {params: params})
       .then(response => {
+        this.events.push(response.data);
         this.errorEvent = '';
-        this.newEvent.name = this.newEvent.date = this.newEvent.startTime = this.newEvent.endTime = this.newEvent.title = '';
+        this.newEvent.name = this.newEvent.date = this.newEvent.startTime = this.newEvent.endTime = this.newEvent.title = null;
       })
       .catch(e => {
         e = e.response.data.message ? e.response.data.message : e;
@@ -177,11 +158,9 @@ export default {
         person: personName,
         event: eventName
       };
-      if (!person.eventsAttended.find(x => x.name === eventName)) {
-        person.eventsAttended.push(event);
-      }
       AXIOS.post('/register', {}, {params: params})
       .then(response => {
+        person.eventsAttended.push(event);
         this.selectedPerson = '';
         this.selectedEvent = '';
         this.errorRegistration = '';
@@ -193,24 +172,6 @@ export default {
       });
     },
 
-    getRegistrations: function (personName) {
-      AXIOS.get('/registrations/person/'.concat(personName))
-      .then(response => {
-        if (!response.data || response.data.length <= 0) return;
-
-        let indexPart = this.persons.map(x => x.name).indexOf(personName);
-        this.persons[indexPart].eventsAttended = [];
-        this.persons[indexPart].paypals = [];
-        response.data.forEach(registration => {
-          this.persons[indexPart].eventsAttended.push(registration.event);
-          this.persons[indexPart].paypals.push(registration.paypal);
-        });
-      })
-      .catch(e => {
-        console.log(e);
-      });
-    },
-
     assignEvent: function (performerName, eventName) {
       let performer = this.performers.find(x => x.name === performerName)
       let event = this.events.find(x => x.name === eventName)
@@ -218,12 +179,9 @@ export default {
         performer: performer.name,
         event: event.name
       };
-      if (!performer.eventsPerformed.find(x => x.name === eventName)) {
-        performer.eventsPerformed.push(event);
-      }
       AXIOS.post('/assign', {}, {params: params})
       .then(response => {
-        alert(response.data);
+        performer.eventsPerformed.push(response.data);
         this.selectedEventToAssign = '';
         this.selectedPerformer = '';
         this.errorRegistration = '';

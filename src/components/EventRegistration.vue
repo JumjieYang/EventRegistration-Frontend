@@ -19,15 +19,16 @@
         </td>
         <td>
           <ul>
-            <li v-for="(paypal, i) in person.paypals" v-bind:key="`event-${i}`" style="list-style-type: disc;">
-              <span class='registration-event-name'>{{paypal.accountId}}</span>
+            <li v-for="(paypal, i) in person.paypals" v-bind:key="`event-${i}`" style="list-style-type: none;">
+              <span>{{paypal.accountId}}</span>
             </li>
           </ul>
         </td>
         <td>
-          <ul>
-            <li v-for="(paypal, i) in person.paypals" v-bind:key="`event-${i}`" style="list-style-type: disc;">
-              <span class='registration-event-name'>{{paypal.amount}}</span>
+          <ul >
+            <li v-for="(paypal, i) in person.paypals" v-bind:key="`paypal-${i}`" style="list-style-type: none;">
+              <span v-if="paypal.amount !== 0">{{paypal.amount}}</span>
+              <span v-else>{{" "}}</span>
             </li>
           </ul>
         </td>
@@ -65,7 +66,9 @@
         <td v-bind:id="`${event.name.replace(/\s/g, '-')}-date`">{{event.date}}</td>
         <td v-bind:id="`${event.name.replace(/\s/g, '-')}-starttime`">{{event.startTime}}</td>
         <td v-bind:id="`${event.name.replace(/\s/g, '-')}-endtime`">{{event.endTime}}</td>
-        <td v-bind:id="`${event.name.replace(/\s/g, '-')}-title`">{{event.title}}</td>
+        <td v-bind:id="`${event.name.replace(/\s/g, '-')}-title`" >
+          <span v-if="event.title">{{event.title}}</span>
+          <span v-else>{{"--"}}</span></td>
 
       </tr>
       <tr>
